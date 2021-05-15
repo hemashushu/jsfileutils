@@ -1,11 +1,13 @@
-const CaseType = require('./src/casetype');
+const BaseFileInfo = require('./src/basefileinfo');
+const BaseFolderInfo = require('./src/basefolderinfo');
+const FileUtils = require('./src/fileutils');
 const HashAlgorithm = require('./src/hashalgorithm');
-const StringUtils = require('./src/stringutils');
-const UnicodeCharType = require('./src/unicodechartype');
+const PromiseFileUtils = require('./src/promisefileutils');
 
 module.exports = {
-    CaseType: CaseType,
+    BaseFileInfo: BaseFileInfo,
+    BaseFolderInfo: BaseFolderInfo,
+    FileUtils: FileUtils,
     HashAlgorithm: HashAlgorithm,
-    StringUtils: StringUtils,
-    UnicodeCharType: UnicodeCharType
+    PromiseFileUtils: PromiseFileUtils
 };
