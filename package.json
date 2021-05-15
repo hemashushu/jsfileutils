@@ -1,0 +1,29 @@
+{
+  "name": "jsfileutils",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hemashushu/jsfileutils.git"
+  },
+  "keywords": [
+    "utility",
+    "object"
+  ],
+  "author": "Hippo Spark <hippospark@gmail.com> (https://twitter.com/hemashushu)",
+  "license": "SEE LICENSE IN <LICENSE.md>",
+  "bugs": {
+    "url": "https://github.com/hemashushu/jsfileutils/issues"
+  },
+  "homepage": "https://github.com/hemashushu/jsfileutils#readme",
+  "devDependencies": {
+    "mocha": "^8.3.2"
+  },
+  "dependencies": {
+    "jsobjectutils": "github:hemashushu/jsobjectutils"
+  }
+}
