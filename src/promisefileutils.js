@@ -149,29 +149,29 @@ class PromiseFileUtils extends FileUtils {
         });
     }
 
-    static readTextFileIntoLines(filePath) {
-        return new Promise((resolve, reject) => {
-            FileUtils.readTextFileIntoLines(filePath, (err, lines) => {
-                if (err) {
-                    reject(err);
-                } else {
-                    resolve(lines);
-                }
-            });
-        });
-    }
-
-    static writeLinesToTextFile(filePath, lines) {
-        return new Promise((resolve, reject) => {
-            FileUtils.writeLinesToTextFile(filePath, lines, (err) => {
-                if (err) {
-                    reject(err);
-                } else {
-                    resolve();
-                }
-            });
-        });
-    }
+//     static readTextFileIntoLines(filePath) {
+//         return new Promise((resolve, reject) => {
+//             FileUtils.readTextFileIntoLines(filePath, (err, lines) => {
+//                 if (err) {
+//                     reject(err);
+//                 } else {
+//                     resolve(lines);
+//                 }
+//             });
+//         });
+//     }
+//
+//     static writeLinesToTextFile(filePath, lines) {
+//         return new Promise((resolve, reject) => {
+//             FileUtils.writeLinesToTextFile(filePath, lines, (err) => {
+//                 if (err) {
+//                     reject(err);
+//                 } else {
+//                     resolve();
+//                 }
+//             });
+//         });
+//     }
 }
 
 module.exports = PromiseFileUtils;

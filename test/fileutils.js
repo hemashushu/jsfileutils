@@ -16,4 +16,7 @@ describe('FileUtils Test', () => {
         assert(!FileUtils.isAbsoulteUrl('/path/to/page'));
     });
 
+    it('Test TODO', ()=>{
+        //
+    });
 });

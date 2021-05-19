@@ -26,6 +26,17 @@ const BaseFolderInfo = require('./basefolderinfo');
 
 const generalUriSchemes = ['http://', 'https://', 'file://'];
 
+const defaultLocaleByteTitles = {
+    byte: 'Byte',
+    bytes: 'Bytes',
+    kb: 'KB',
+    mb: 'MB',
+    gb: 'GB'
+}
+
+const KByteValue = 1024;
+const MByteValue = 1024 * KByteValue;
+const GByteValue = 1024 * MByteValue;
 
 class FileUtils {
 
@@ -591,60 +602,85 @@ class FileUtils {
         });
     }
 
-    /**
-     * 读取一个文本文件到一个字符串数组，数组中的每个元素为文本的每一行内容。
-     *
-     * @param {*} filePath 目标文件，必须是文本文件，且编码为 utf-8
-     * @param {*} callback callback(err, lines) 当目标文件不存在时，
-     *     lines 的值为 undefined。当文件内容为空时，lines 为空数组。
-     */
-    static readTextFileIntoLines(filePath, callback) {
-        fs.readFile(filePath, 'utf-8', (err, lastTextContent) => {
-            if (err) {
-                if (err.code === 'ENOENT') {
-                    // 目标文件不存在，返回 undefined.
-                    callback(null);
-                } else {
-                    callback(err);
-                }
-                return;
-            }
+    //     /**
+    //      * 读取一个文本文件到一个字符串数组，数组中的每个元素为文本的每一行内容。
+    //      *
+    //      * @param {*} filePath 目标文件，必须是文本文件，且编码为 utf-8
+    //      * @param {*} callback callback(err, lines) 当目标文件不存在时，
+    //      *     lines 的值为 undefined。当文件内容为空时，lines 为空数组。
+    //      */
+    //     static readTextFileIntoLines(filePath, callback) {
+    //         fs.readFile(filePath, 'utf-8', (err, lastTextContent) => {
+    //             if (err) {
+    //                 if (err.code === 'ENOENT') {
+    //                     // 目标文件不存在，返回 undefined.
+    //                     callback(null);
+    //                 } else {
+    //                     callback(err);
+    //                 }
+    //                 return;
+    //             }
+    //
+    //             if (lastTextContent === '') {
+    //                 // 目标文件内容为空，返回空数组
+    //                 callback(null, []);
+    //                 return;
+    //             }
+    //
+    //             // 替换 '\r\n' 换行符（Windows 系统的应用所创建的文本文件
+    //             // 通常是以这种方式换行）为 '\n'。
+    //             lastTextContent = lastTextContent.replace(/\r\n/g, '\n');
+    //             let lines = lastTextContent.split('\n');
+    //             callback(null, lines);
+    //         });
+    //     }
+    //
+    //     /**
+    //      * 将一个字符串数组写入到目标文本文件。
+    //      *
+    //      * 目标文件将会以 utf-8 编码，并且每次写入时都会覆盖已有的
+    //      * 内容（假如有的话）。
+    //      *
+    //      * @param {*} filePath 目标文件
+    //      * @param {*} lines
+    //      * @param {*} callback callback(err)
+    //      * @returns
+    //      */
+    //     static writeLinesToTextFile(filePath, lines, callback) {
+    //         let textContent = lines.join('\n');
+    //         fs.writeFile(filePath, textContent, 'utf-8', (err) => {
+    //             if (err) {
+    //                 callback(err);
+    //                 return;
+    //             }
+    //
+    //             callback();
+    //         });
+    //     }
 
-            if (lastTextContent === '') {
-                // 目标文件内容为空，返回空数组
-                callback(null, []);
-                return;
-            }
+    static formatFileSize(size, localeByteTitles = {}) {
+        // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/assign
+        let titles = Object.assign({}, defaultLocaleByteTitles, localeByteTitles);
 
-            // 替换 '\r\n' 换行符（Windows 系统的应用所创建的文本文件
-            // 通常是以这种方式换行）为 '\n'。
-            lastTextContent = lastTextContent.replace(/\r\n/g, '\n');
-            let lines = lastTextContent.split('\n');
-            callback(null, lines);
-        });
-    }
+        if (size >= GByteValue) {
+            let length = size / GByteValue;
+            // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/toFixed
+            return `${length.toFixed(1)} ${titles.gb}`;
 
-    /**
-     * 将一个字符串数组写入到目标文本文件。
-     *
-     * 目标文件将会以 utf-8 编码，并且每次写入时都会覆盖已有的
-     * 内容（假如有的话）。
-     *
-     * @param {*} filePath 目标文件
-     * @param {*} lines
-     * @param {*} callback callback(err)
-     * @returns
-     */
-    static writeLinesToTextFile(filePath, lines, callback) {
-        let textContent = lines.join('\n');
-        fs.writeFile(filePath, textContent, 'utf-8', (err) => {
-            if (err) {
-                callback(err);
-                return;
-            }
+        } else if (size >= MByteValue) {
+            let length = size / MByteValue;
+            return `${length.toFixed(1)} ${titles.mb}`;
 
-            callback();
-        });
+        } else if (size >= KByteValue) {
+            let length = size / KByteValue;
+            return `${length.toFixed(1)} ${titles.kb}`;
+
+        } else if (size > 1) {
+            return `${size} ${titles.bytes}`;
+
+        } else {
+            return `${size} ${titles.byte}`;
+        }
     }
 }
 
