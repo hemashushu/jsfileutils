@@ -659,8 +659,21 @@ class FileUtils {
     //     }
 
     static formatFileSize(size, localeByteTitles = {}) {
-        // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/assign
-        let titles = Object.assign({}, defaultLocaleByteTitles, localeByteTitles);
+        // 注意不要使用 Object.assign({}, defaultObject, userObject) 方法
+        // 合并用户设置对象和默认值对象。
+        // 因为 Object.assign 在合并 userObject 对象和 defaultObject 时，
+        // 会把 userObject 当中同值为 undefined 属性一起覆盖 defaultObject，通常
+        // 这不是我们期望的结果。
+        // 比如：
+        // defaultObject: {a: 123, b: 'foo'}
+        // userObject: {a: 456, b: undefined}
+        //
+        // Object.assign({}, defaultObject, userObject) 的结果是:
+        // {a: 456, b: undefined }
+        //
+        // 详细见 ObjectUtils.objectMerge() 方法的说明。
+
+        let titles = ObjectUtils.objectMerge(localeByteTitles, defaultLocaleByteTitles);
 
         if (size >= GByteValue) {
             let length = size / GByteValue;
