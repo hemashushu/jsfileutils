@@ -513,7 +513,7 @@ class FileUtils {
      * 判断指定的一组文件是否都存在。
      *
      * @param {*} filePaths
-     * @param {*} callback callback(err, all-exists?, the-absent-file-path)
+     * @param {*} callback callback(err, is-all-exists?, the-absent-file-path)
      */
     static existsAll(filePaths, callback) {
 
@@ -549,7 +549,7 @@ class FileUtils {
      * 判断指定的一组文件是否至少存在其中的一个。
      *
      * @param {*} filePaths
-     * @param {*} callback callback(err, exists-any?, the-first-exists-file-path).
+     * @param {*} callback callback(err, is-exists-any?, the-first-exists-file-path).
      */
     static existsAny(filePaths, callback) {
 
@@ -601,62 +601,6 @@ class FileUtils {
             callback(null, true);
         });
     }
-
-    //     /**
-    //      * 读取一个文本文件到一个字符串数组，数组中的每个元素为文本的每一行内容。
-    //      *
-    //      * @param {*} filePath 目标文件，必须是文本文件，且编码为 utf-8
-    //      * @param {*} callback callback(err, lines) 当目标文件不存在时，
-    //      *     lines 的值为 undefined。当文件内容为空时，lines 为空数组。
-    //      */
-    //     static readTextFileIntoLines(filePath, callback) {
-    //         fs.readFile(filePath, 'utf-8', (err, lastTextContent) => {
-    //             if (err) {
-    //                 if (err.code === 'ENOENT') {
-    //                     // 目标文件不存在，返回 undefined.
-    //                     callback(null);
-    //                 } else {
-    //                     callback(err);
-    //                 }
-    //                 return;
-    //             }
-    //
-    //             if (lastTextContent === '') {
-    //                 // 目标文件内容为空，返回空数组
-    //                 callback(null, []);
-    //                 return;
-    //             }
-    //
-    //             // 替换 '\r\n' 换行符（Windows 系统的应用所创建的文本文件
-    //             // 通常是以这种方式换行）为 '\n'。
-    //             lastTextContent = lastTextContent.replace(/\r\n/g, '\n');
-    //             let lines = lastTextContent.split('\n');
-    //             callback(null, lines);
-    //         });
-    //     }
-    //
-    //     /**
-    //      * 将一个字符串数组写入到目标文本文件。
-    //      *
-    //      * 目标文件将会以 utf-8 编码，并且每次写入时都会覆盖已有的
-    //      * 内容（假如有的话）。
-    //      *
-    //      * @param {*} filePath 目标文件
-    //      * @param {*} lines
-    //      * @param {*} callback callback(err)
-    //      * @returns
-    //      */
-    //     static writeLinesToTextFile(filePath, lines, callback) {
-    //         let textContent = lines.join('\n');
-    //         fs.writeFile(filePath, textContent, 'utf-8', (err) => {
-    //             if (err) {
-    //                 callback(err);
-    //                 return;
-    //             }
-    //
-    //             callback();
-    //         });
-    //     }
 
     static formatFileSize(size, localeByteTitles = {}) {
         // 注意不要使用 Object.assign({}, defaultObject, userObject) 方法

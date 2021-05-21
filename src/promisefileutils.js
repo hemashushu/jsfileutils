@@ -113,30 +113,45 @@ class PromiseFileUtils extends FileUtils {
         });
     }
 
+    /**
+     *
+     * @param {*} filePaths
+     * @returns 返回 Promise ({isAllExists, absentFilePath})
+     */
     static existsAll(filePaths) {
         return new Promise((resolve, reject) => {
-            FileUtils.existsAll(filePaths, (err, allExists, absentFilePath) => {
+            FileUtils.existsAll(filePaths, (err, isAllExists, absentFilePath) => {
                 if (err) {
                     reject(err);
                 } else {
-                    resolve(allExists, absentFilePath);
+                    resolve({isAllExists, absentFilePath});
                 }
             });
         });
     }
 
+    /**
+     *
+     * @param {*} filePaths
+     * @returns 返回 Promise ({isExistsAny, existsFilePath})
+     */
     static existsAny(filePaths) {
         return new Promise((resolve, reject) => {
-            FileUtils.existsAny(filePaths, (err, existsAny, existsFilePath) => {
+            FileUtils.existsAny(filePaths, (err, isExistsAny, existsFilePath) => {
                 if (err) {
                     reject(err);
                 } else {
-                    resolve(existsAny, existsFilePath);
+                    resolve({isExistsAny, existsFilePath});
                 }
             });
         });
     }
 
+    /**
+     *
+     * @param {*} filePath
+     * @returns 返回 Promise (isExists)
+     */
     static exists(filePath) {
         return new Promise((resolve, reject) => {
             FileUtils.exists(filePath, (err, isExists) => {
@@ -148,30 +163,6 @@ class PromiseFileUtils extends FileUtils {
             });
         });
     }
-
-//     static readTextFileIntoLines(filePath) {
-//         return new Promise((resolve, reject) => {
-//             FileUtils.readTextFileIntoLines(filePath, (err, lines) => {
-//                 if (err) {
-//                     reject(err);
-//                 } else {
-//                     resolve(lines);
-//                 }
-//             });
-//         });
-//     }
-//
-//     static writeLinesToTextFile(filePath, lines) {
-//         return new Promise((resolve, reject) => {
-//             FileUtils.writeLinesToTextFile(filePath, lines, (err) => {
-//                 if (err) {
-//                     reject(err);
-//                 } else {
-//                     resolve();
-//                 }
-//             });
-//         });
-//     }
 }
 
 module.exports = PromiseFileUtils;
