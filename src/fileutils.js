@@ -5,8 +5,8 @@ const path = require('path');
 const { ObjectUtils } = require('jsobjectutils');
 
 const HashAlgorithm = require('./hashalgorithm');
-const BaseFileInfo = require('./basefileinfo');
-const BaseFolderInfo = require('./basefolderinfo');
+const FileInfo = require('./fileinfo');
+const FolderInfo = require('./folderinfo');
 
 // URI 的方案/协议
 //
@@ -281,66 +281,180 @@ class FileUtils {
     }
 
     /**
-     * 简单列举一个目录里的文件及子目录
+     * 获取指定文件或文件夹的 FileInfo
      *
-     * @param {*} directory
-     * @param {*} callback callback(err, [AbstractBaseFileInfo,...])
+     * @param {*} filePath
+     * @param {*} callback 回调返回 (err, AbstractFileInfo)
      */
-    static list(directory, callback) {
-
-        let items = [];
-
-        let processNext = (fileNames) => {
-            if (fileNames.length === 0) {
-                callback(null, items);
+    static getFileInfo(filePath, callback) {
+        fs.stat(filePath, (err, stat) => {
+            if (err) {
+                callback(err);
                 return;
             }
 
-            let fileName = fileNames.pop();
-            let filePath = path.join(directory, fileName);
+            // stat.birthtime 为文件的创建时间，为 Date 类型的数据
+            // stat.birthtimeMS 同样也是文件的创建时间，不过数据类型
+            //     为 int, 数值是从 1970 开始经过的毫秒（milliseconds）。
+            //
+            // stat.mtime 为文件内容修改的时间
+            // stat.ctime 为文件状态（比如权限）的修改时间
 
-            fs.stat(filePath, (err, stat) => {
+            let fileInfo;
+            if (stat.isDirectory()) {
+                fileInfo = new FolderInfo(
+                    filePath,
+                    stat.birthtime);
+
+            } else {
+                fileInfo = new FileInfo(
+                    filePath,
+                    stat.birthtime,
+                    stat.size,
+                    stat.mtime
+                );
+            }
+
+            callback(null, fileInfo);
+        });
+    }
+
+    /**
+     * 列举指定目录里的文件及子目录
+     *
+     * - 不包括子目录里的内容
+     *
+     * @param {*} folderPath
+     * @param {*} callback callback(err, [AbstractFileInfo,...])
+     */
+    static list(folderPath, callback) {
+
+        let fileInfos = [];
+
+        let processNext = (fileNames) => {
+            if (fileNames.length === 0) {
+                callback(null, fileInfos);
+                return;
+            }
+
+            let fileName = fileNames.shift();
+            let filePath = path.join(folderPath, fileName);
+
+            FileUtils.getFileInfo(filePath, (err, fileInfo) => {
                 if (err) {
                     callback(err);
                     return;
                 }
 
-                // stat.birthtime 为文件的创建时间，为 Date 类型的数据
-                // stat.birthtimeMS 同样也是文件的创建时间，不过数据类型
-                //     为 int, 数值是从 1970 开始经过的毫秒（milliseconds）。
-                //
-                // stat.mtime 为文件内容修改的时间
-                // stat.ctime 为文件状态（比如权限）的修改时间
-
-                if (stat.isDirectory()) {
-                    let item = new BaseFolderInfo(
-                        fileName,
-                        stat.birthtime);
-
-                    items.push(item);
-
-                } else {
-                    let item = new BaseFileInfo(
-                        fileName,
-                        stat.birthtime,
-                        stat.size,
-                        stat.mtime
-                    );
-
-                    items.push(item);
-                }
-
+                fileInfos.push(fileInfo);
                 processNext(fileNames);
             });
         };
 
-        fs.readdir(directory, (err, fileNames) => {
+        fs.readdir(folderPath, (err, fileNames) => {
             if (err) {
                 callback(err);
                 return;
             }
 
             processNext(fileNames);
+        });
+    }
+
+    /**
+     * 列举指定目录的所有内容，包括所有子文件夹里的内容
+     *
+     * 返回的 FileInfo 列表是一个扁平的列表（即没有层次结构），
+     * 处于深层的文件位于列表末端，处于浅层的文件位于列表的前端。
+     *
+     * @param {*} folderPath 目录路径
+     * @param {*} callback 回调返回 (err, AbstractFileInfo[])
+     */
+    static listRecursively(folderPath, callback) {
+        let fileInfos = [];
+
+        let folderInfoStack = [];
+        let processNext = () => {
+            if (folderInfoStack.length === 0) {
+                callback(null, fileInfos);
+                return;
+            }
+
+            let currentFolderInfo = folderInfoStack.pop();
+            FileUtils.list(currentFolderInfo.filePath, (err, lastFileInfos) => {
+                if (err) {
+                    callback(err);
+                    return;
+                }
+
+                for (let lastFileInfo of lastFileInfos) {
+                    fileInfos.push(lastFileInfo);
+
+                    if (lastFileInfo instanceof FolderInfo) {
+                        folderInfoStack.push(lastFileInfo);
+                    }
+                }
+
+                processNext();
+            });
+        };
+
+        FileUtils.getFileInfo(folderPath, (err, folderInfo) => {
+            if (err) {
+                callback(err);
+                return;
+            }
+
+            folderInfoStack.push(folderInfo);
+            processNext();
+        });
+    }
+
+    /**
+     *
+     * @param {*} folderPath
+     * @param {*} callback 回调返回 (err, FolderInfo)
+     */
+    static listRecursivelyInTree(folderPath, callback) {
+        let firstFolderInfo;
+
+        let folderInfoStack = [];
+        let processNext = () => {
+            if (folderInfoStack.length === 0) {
+                callback(null, firstFolderInfo);
+                return;
+            }
+
+            let currentFolderInfo = folderInfoStack.pop();
+            FileUtils.list(currentFolderInfo.filePath, (err, lastFileInfos) => {
+                if (err) {
+                    callback(err);
+                    return;
+                }
+
+                // 复制当层内容到 currentFolderInfo
+                Array.prototype.push.apply(currentFolderInfo.children, lastFileInfos)
+
+                for (let lastFileInfo of lastFileInfos) {
+                    if (lastFileInfo instanceof FolderInfo) {
+                        folderInfoStack.push(lastFileInfo);
+                    }
+                }
+
+                processNext();
+            });
+        };
+
+        FileUtils.getFileInfo(folderPath, (err, folderInfo) => {
+            if (err) {
+                callback(err);
+                return;
+            }
+
+            firstFolderInfo = folderInfo;
+
+            folderInfoStack.push(folderInfo);
+            processNext();
         });
     }
 
