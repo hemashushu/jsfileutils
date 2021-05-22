@@ -1,6 +1,6 @@
 const FileUtils = require('./fileutils');
 
-class PromiseFileUtils extends FileUtils {
+class PromiseFileUtils {
     static findNewFileName(directory, fileName) {
         return new Promise((resolve, reject) => {
             FileUtils.findNewFileName(directory, fileName, (err, newFileName) => {
