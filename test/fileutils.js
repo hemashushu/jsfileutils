@@ -1,16 +1,16 @@
 const path = require('path');
 
 const assert = require('assert/strict');
-const {ObjectUtils} = require('jsobjectutils');
+const { ObjectUtils } = require('jsobjectutils');
 
-const {FileInfo, FolderInfo, FileUtils, HashAlgorithm, PromiseFileUtils} = require('../index');
+const { FileInfo, FolderInfo, FileUtils, HashAlgorithm, PromiseFileUtils } = require('../index');
 
 const testDir = __dirname;
 const testResourceFolderName = 'resource';
 const testResourceDir = path.join(testDir, testResourceFolderName);
 
 describe('FileUtils Test', () => {
-    it('Test isAbsoulteUrl()', ()=>{
+    it('Test isAbsoulteUrl()', () => {
         assert(FileUtils.isAbsoulteUrl('http://some.domain/path/to/page'));
         assert(FileUtils.isAbsoulteUrl('https://some.domain/path/to/page'));
         assert(FileUtils.isAbsoulteUrl('file:///path/to/file'));
@@ -18,7 +18,7 @@ describe('FileUtils Test', () => {
         assert(!FileUtils.isAbsoulteUrl('/path/to/page'));
     });
 
-    describe('Test getFileInfo()', ()=>{
+    describe('Test getFileInfo()', () => {
         it('Test get file info', (done) => {
             let test1FilePath = path.join(testResourceDir, 'test1.txt');
             FileUtils.getFileInfo(test1FilePath, (err, fileInfo) => {
@@ -30,6 +30,10 @@ describe('FileUtils Test', () => {
                 assert(fileInfo instanceof FileInfo);
                 assert.equal(fileInfo.filePath, test1FilePath);
                 assert.equal(fileInfo.size, 10);
+                assert(fileInfo.lastModified.getTime() > 0); // Date.getTime() 返回毫秒
+
+                assert.equal(fileInfo.fileName, path.basename(test1FilePath));
+                assert.equal(fileInfo.fileDir, path.dirname(test1FilePath));
 
                 done();
             });
@@ -45,13 +49,15 @@ describe('FileUtils Test', () => {
 
                 assert(fileInfo instanceof FolderInfo);
                 assert.equal(fileInfo.filePath, dir1FilePath);
+                assert.equal(fileInfo.fileName, path.basename(dir1FilePath));
+                assert.equal(fileInfo.fileDir, path.dirname(dir1FilePath));
 
                 done();
             });
         });
     });
 
-    describe('Test list file info', ()=>{
+    describe('Test list file info', () => {
         it('Test list()', (done) => {
             FileUtils.list(testResourceDir, (err, fileInfos) => {
                 if (err) {
@@ -98,7 +104,7 @@ describe('FileUtils Test', () => {
         });
     });
 
-    describe('Test list file info recursively', ()=>{
+    describe('Test list file info recursively', () => {
         it('Test list recursively - flat', (done) => {
             FileUtils.listRecursively(testResourceDir, (err, fileInfos) => {
                 if (err) {
@@ -108,7 +114,7 @@ describe('FileUtils Test', () => {
 
                 let baseDirLength = testResourceDir.length;
                 let names = fileInfos
-                    .map(item=>{
+                    .map(item => {
                         return item.filePath.substring(baseDirLength);
                     })
                     .sort();

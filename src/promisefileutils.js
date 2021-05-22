@@ -38,13 +38,49 @@ class PromiseFileUtils extends FileUtils {
         });
     }
 
-    static list(directory) {
+    static getFileInfo(filePath) {
         return new Promise((resolve, reject) => {
-            FileUtils.list(directory, (err, fileInfos) => {
+            FileUtils.getFileInfo(directory, (err, fileInfo) => {
                 if (err) {
                     reject(err);
                 } else {
-                    resolve(fileInfos);
+                    resolve(fileInfo);
+                }
+            });
+        });
+    }
+
+    static list(folderPath) {
+        return new Promise((resolve, reject) => {
+            FileUtils.list(folderPath, (err, abstractFileInfos) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(abstractFileInfos);
+                }
+            });
+        });
+    }
+
+    static listRecursively(folderPath) {
+        return new Promise((resolve, reject) => {
+            FileUtils.listRecursively(folderPath, (err, abstractFileInfos) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(abstractFileInfos);
+                }
+            });
+        });
+    }
+
+    static listRecursivelyInTree(folderPath) {
+        return new Promise((resolve, reject) => {
+            FileUtils.listRecursivelyInTree(folderPath, (err, folderInfo) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(folderInfo);
                 }
             });
         });

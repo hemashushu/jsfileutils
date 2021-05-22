@@ -329,11 +329,11 @@ class FileUtils {
      */
     static list(folderPath, callback) {
 
-        let fileInfos = [];
+        let abstractFileInfos = [];
 
         let processNext = (fileNames) => {
             if (fileNames.length === 0) {
-                callback(null, fileInfos);
+                callback(null, abstractFileInfos);
                 return;
             }
 
@@ -346,7 +346,7 @@ class FileUtils {
                     return;
                 }
 
-                fileInfos.push(fileInfo);
+                abstractFileInfos.push(fileInfo);
                 processNext(fileNames);
             });
         };
@@ -371,12 +371,12 @@ class FileUtils {
      * @param {*} callback 回调返回 (err, AbstractFileInfo[])
      */
     static listRecursively(folderPath, callback) {
-        let fileInfos = [];
+        let abstractFileInfos = [];
 
         let folderInfoStack = [];
         let processNext = () => {
             if (folderInfoStack.length === 0) {
-                callback(null, fileInfos);
+                callback(null, abstractFileInfos);
                 return;
             }
 
@@ -388,7 +388,7 @@ class FileUtils {
                 }
 
                 for (let lastFileInfo of lastFileInfos) {
-                    fileInfos.push(lastFileInfo);
+                    abstractFileInfos.push(lastFileInfo);
 
                     if (lastFileInfo instanceof FolderInfo) {
                         folderInfoStack.push(lastFileInfo);
