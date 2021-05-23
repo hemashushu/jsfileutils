@@ -41,56 +41,6 @@ const GByteValue = 1024 * MByteValue;
 class FileUtils {
 
     /**
-     * 判断一个 URL 是否绝对地址
-     * 这里仅简答地判断 URL 是否以 URI 协议开头
-     *
-     * @param {*} url
-     * @returns
-     */
-    static isAbsoulteUrl(url) {
-        return generalUriSchemes.find((item) => {
-            return url.startsWith(item);
-        }) !== undefined;
-    }
-
-    /**
-     * 移除文件名当中的非法字符。
-     *
-     * 在 Linux 常见的文件系统中对文件名允许的字符限制较少，除了 '/' 保留作为
-     * 路径分隔符之外，大部分字符都可以作为文件名。
-     * 但 Windows 文件系统的文件名保留了下列字符：
-     *
-     * - The following reserved characters:
-     * - < (less than)
-     * - > (greater than)
-     * - : (colon)
-     * - " (double quote)
-     * - / (forward slash)
-     * - \ (backslash)
-     * - | (vertical bar or pipe)
-     * - ? (question mark)
-     * - * (asterisk)
-     *
-     * https://msdn.microsoft.com/en-us/library/windows/desktop/aa365247(v=vs.85).aspx
-     *
-     * 为了让应用程序产生的文件有较好的平台兼容性，可以使用这个方法把 Windows 文件系统
-     * 的文件名保留字符替换为空格。
-     *
-     * @param {*} fileName
-     * @returns
-     */
-    static removeFileNameInvalidCharacters(fileName) {
-        // 把 Windows 文件系统的文件名保留字符替换为空格。
-        fileName = fileName.replace(/[<>:"\/\\|?*]+/g, ' ');
-
-        // 连续的 2 个以上空格替换为 1 个空格。
-        fileName = fileName.replace(/\s{2,}/g, ' ');
-        fileName = fileName.trim();
-
-        return fileName === '' ? '_' : fileName;
-    }
-
-    /**
      * 在指定的目录里获取一个不重复的文件名。
      *
      * 该方法一般用于创建新文件之前为用户选择合适的默认文件名。
@@ -479,28 +429,6 @@ class FileUtils {
     }
 
     /**
-     * 计算数据（Buffer）的哈希值(Hash)/散列值
-     *
-     * @param {*} bufferData
-     * @param {*} hashAlgorithm HashAlgorithm 类型
-     * @returns 返回散列值的小写 16 进制字符串。
-     */
-    static hashData(bufferData, hashAlgorithm = HashAlgorithm.sha256) {
-        let hash;
-        switch (hashAlgorithm) {
-            case HashAlgorithm.sha256:
-                hash = crypto.createHash('sha256');
-                break;
-
-            default:
-                IllegalArgumentException('Unsupport hash algorithm.');
-        }
-
-        hash.update(bufferData);
-        return hash.digest('hex');
-    }
-
-    /**
      * 以指定名称备份文件到指定目录。
      *
      * 示例：
@@ -716,6 +644,56 @@ class FileUtils {
         });
     }
 
+    /**
+     * 判断一个 URL 是否绝对地址
+     * 这里仅简答地判断 URL 是否以 URI 协议开头
+     *
+     * @param {*} url
+     * @returns
+     */
+    static isAbsoulteUrl(url) {
+        return generalUriSchemes.find((item) => {
+            return url.startsWith(item);
+        }) !== undefined;
+    }
+
+    /**
+     * 移除文件名当中的非法字符。
+     *
+     * 在 Linux 常见的文件系统中对文件名允许的字符限制较少，除了 '/' 保留作为
+     * 路径分隔符之外，大部分字符都可以作为文件名。
+     * 但 Windows 文件系统的文件名保留了下列字符：
+     *
+     * - The following reserved characters:
+     * - < (less than)
+     * - > (greater than)
+     * - : (colon)
+     * - " (double quote)
+     * - / (forward slash)
+     * - \ (backslash)
+     * - | (vertical bar or pipe)
+     * - ? (question mark)
+     * - * (asterisk)
+     *
+     * https://msdn.microsoft.com/en-us/library/windows/desktop/aa365247(v=vs.85).aspx
+     *
+     * 为了让应用程序产生的文件有较好的平台兼容性，可以使用这个方法把 Windows 文件系统
+     * 的文件名保留字符替换为空格。
+     *
+     * @param {*} fileName
+     * @returns
+     */
+    static removeFileNameInvalidCharacters(fileName) {
+        // 把 Windows 文件系统的文件名保留字符替换为空格。
+        fileName = fileName.replace(/[<>:"\/\\|?*]+/g, ' ');
+
+        // 连续的 2 个以上空格替换为 1 个空格。
+        fileName = fileName.replace(/\s{2,}/g, ' ');
+        fileName = fileName.trim();
+
+        return fileName === '' ? '_' : fileName;
+    }
+
     static formatFileSize(size, localeByteTitles = {}) {
         // 注意不要使用 Object.assign({}, defaultObject, userObject) 方法
         // 合并用户设置对象和默认值对象。
@@ -752,6 +730,28 @@ class FileUtils {
         } else {
             return `${size} ${titles.byte}`;
         }
+    }
+
+    /**
+     * 计算数据（Buffer）的哈希值(Hash)/散列值
+     *
+     * @param {*} bufferData
+     * @param {*} hashAlgorithm HashAlgorithm 类型
+     * @returns 返回散列值的小写 16 进制字符串。
+     */
+    static hashData(bufferData, hashAlgorithm = HashAlgorithm.sha256) {
+        let hash;
+        switch (hashAlgorithm) {
+            case HashAlgorithm.sha256:
+                hash = crypto.createHash('sha256');
+                break;
+
+            default:
+                IllegalArgumentException('Unsupport hash algorithm.');
+        }
+
+        hash.update(bufferData);
+        return hash.digest('hex');
     }
 }
 

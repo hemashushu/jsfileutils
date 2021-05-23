@@ -40,7 +40,7 @@ class PromiseFileUtils {
 
     static getFileInfo(filePath) {
         return new Promise((resolve, reject) => {
-            FileUtils.getFileInfo(directory, (err, fileInfo) => {
+            FileUtils.getFileInfo(filePath, (err, fileInfo) => {
                 if (err) {
                     reject(err);
                 } else {
@@ -160,7 +160,7 @@ class PromiseFileUtils {
                 if (err) {
                     reject(err);
                 } else {
-                    resolve({isAllExists, absentFilePath});
+                    resolve({ isAllExists, absentFilePath });
                 }
             });
         });
@@ -177,7 +177,7 @@ class PromiseFileUtils {
                 if (err) {
                     reject(err);
                 } else {
-                    resolve({isExistsAny, existsFilePath});
+                    resolve({ isExistsAny, existsFilePath });
                 }
             });
         });
