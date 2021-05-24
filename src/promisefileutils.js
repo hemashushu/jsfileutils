@@ -86,7 +86,7 @@ class PromiseFileUtils {
         });
     }
 
-    static hashFile(filePath, hashAlgorithm = HashAlgorithm.sha256) {
+    static hashFile(filePath, hashAlgorithm) {
         return new Promise((resolve, reject) => {
             FileUtils.hashFile(filePath, hashAlgorithm, (err, hashValue) => {
                 if (err) {
